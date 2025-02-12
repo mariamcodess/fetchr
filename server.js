@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
 const path = require('path');
 const app = express();
 const port = 3000;
@@ -9,15 +8,14 @@ const port = 3000;
 // Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:3001', credentials: true }));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Mock user data
 const users = [
-  { name: 'John Doe', email: 'john@example.com' },
-  { name: 'Jane Doe', email: 'jane@example.com' }
+  { name: 'John Doe', email: 'john@example.com', password: 'password' },
+  { name: 'Jane Doe', email: 'jane@example.com', password: 'password' }
 ];
 
 // Login endpoint
@@ -30,6 +28,20 @@ app.post('/auth/login', (req, res) => {
     res.status(200).send({ message: 'Login successful' });
   } else {
     res.status(401).send({ message: 'Invalid credentials' });
+  }
+});
+
+// Signup endpoint
+app.post('/auth/signup', (req, res) => {
+  const { name, email, password } = req.body;
+  const userExists = users.some(u => u.email === email);
+
+  if (userExists) {
+    res.status(400).send({ message: 'User already exists' });
+  } else {
+    users.push({ name, email, password });
+    res.cookie('fetch-access-token', 'some-auth-token', { httpOnly: true, maxAge: 3600000 });
+    res.status(201).send({ message: 'Signup successful' });
   }
 });
 
