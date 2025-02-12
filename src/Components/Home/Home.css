@@ -1,0 +1,34 @@
+.search-container {
+    padding: 20px;
+  }
+  
+  .search-form {
+    margin-bottom: 20px;
+  }
+  
+  .dog-cards-container {
+    margin-top: 20px;
+  }
+  
+  .dog-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+  
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .generate-match-button {
+    display: block;
+    margin: 20px auto;
+  }
+  
+  .match-container {
+    margin-top: 20px;
+    text-align: center;
+  }
