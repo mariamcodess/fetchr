@@ -1,0 +1,53 @@
+.homePage {
+    padding: 20px;
+}
+
+.search {
+    margin-bottom: 20px;
+}
+
+.search-field {
+    margin-bottom: 10px;
+}
+
+.search-field label {
+    display: block;
+    font-weight: bold;
+}
+
+.search-field select,
+.search-field input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #8d6e63;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #5d4037;
+}
+
+.results ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.results li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.results h2 {
+    margin-top: 20px;
+}
