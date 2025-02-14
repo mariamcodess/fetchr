@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Typography, Select, MenuItem, FormControl, InputLabel, Button, Grid, Card, CardContent, CardActions, IconButton, TextField, Checkbox, ListItemText, Box } from '@mui/material';
-import Pagination from '@mui/lab/Pagination';
+import { Container, Typography, Box, Grid, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, TextField, Card, CardContent, CardActions, IconButton, Pagination, Button } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
-import './Home.css';
 
 const Home = () => {
   const [dogs, setDogs] = useState([]);
@@ -12,28 +10,18 @@ const Home = () => {
   const [selectedZipCodes, setSelectedZipCodes] = useState([]);
   const [ageMin, setAgeMin] = useState('');
   const [ageMax, setAgeMax] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortOrder, setSortOrder] = useState('breed:asc');
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const [match, setMatch] = useState(null);
 
   const fetchBreeds = useCallback(async () => {
-    const response = await fetch('https://frontend-take-home-service.fetch.com/dogs/breeds', {
+    const response = await fetch('/dogs/breeds', {
       credentials: 'include',
     });
     const data = await response.json();
     setBreeds(data);
-  }, []);
-
-  const fetchZipCodes = useCallback(async () => {
-    const zipCodesList = [
-      '10001', '10002', '10003', '10004', '10005', '10006', '10007', '10008', '10009', '10010',
-      '20001', '20002', '20003', '20004', '20005', '20006', '20007', '20008', '20009', '20010',
-      '30001', '30002', '30003', '30004', '30005', '30006', '30007', '30008', '30009', '30010',
-      '40001', '40002', '40003', '40004', '40005', '40006', '40007', '40008', '40009', '40010',
-      '50001', '50002', '50003', '50004', '50005', '50006', '50007', '50008', '50009', '50010',
-    ];
-    setZipCodes(zipCodesList);
   }, []);
 
   const fetchDogs = useCallback(async () => {
@@ -41,16 +29,19 @@ const Home = () => {
     const zipCodesQuery = selectedZipCodes.length ? `zipCodes=${selectedZipCodes.join(',')}` : '';
     const ageMinQuery = ageMin ? `ageMin=${ageMin}` : '';
     const ageMaxQuery = ageMax ? `ageMax=${ageMax}` : '';
-    const sortQuery = `sort=breed:${sortOrder}`;
+    const sortQuery = `sort=${sortOrder}`;
+    const size = 25;
+    const from = (page - 1) * size;
     const query = [breedsQuery, zipCodesQuery, ageMinQuery, ageMaxQuery, sortQuery].filter(Boolean).join('&');
     
-    const response = await fetch(`https://frontend-take-home-service.fetch.com/dogs/search?size=25&from=${(page-1)*25}&${query}`, {
+    const response = await fetch(`/dogs/search?size=${size}&from=${from}&${query}`, {
       credentials: 'include',
     });
     const data = await response.json();
     const dogIds = data.resultIds;
+    setTotal(data.total);
 
-    const dogsResponse = await fetch('https://frontend-take-home-service.fetch.com/dogs', {
+    const dogsResponse = await fetch('/dogs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,16 +51,16 @@ const Home = () => {
     });
     const dogsData = await dogsResponse.json();
     setDogs(dogsData);
+
+    // Extract zip codes from dogs data
+    const zipCodesSet = new Set(dogsData.map(dog => dog.zip_code));
+    setZipCodes([...zipCodesSet]);
   }, [selectedBreeds, selectedZipCodes, ageMin, ageMax, sortOrder, page]);
 
   useEffect(() => {
     fetchBreeds();
-    fetchZipCodes();
-  }, [fetchBreeds, fetchZipCodes]);
-
-  useEffect(() => {
     fetchDogs();
-  }, [fetchDogs]);
+  }, [fetchBreeds, fetchDogs]);
 
   const handleFavoriteToggle = (id) => {
     setFavorites((prev) => {
@@ -82,7 +73,7 @@ const Home = () => {
   };
 
   const generateMatch = async () => {
-    const response = await fetch('https://frontend-take-home-service.fetch.com/dogs/match', {
+    const response = await fetch('/dogs/match', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -91,7 +82,7 @@ const Home = () => {
       credentials: 'include',
     });
     const data = await response.json();
-    const matchResponse = await fetch('https://frontend-take-home-service.fetch.com/dogs', {
+    const matchResponse = await fetch('/dogs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -168,8 +159,12 @@ const Home = () => {
             <FormControl fullWidth margin="normal">
               <InputLabel>Sort Order</InputLabel>
               <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-                <MenuItem value="asc">Ascending</MenuItem>
-                <MenuItem value="desc">Descending</MenuItem>
+                <MenuItem value="breed:asc">Breed Ascending</MenuItem>
+                <MenuItem value="breed:desc">Breed Descending</MenuItem>
+                <MenuItem value="name:asc">Name Ascending</MenuItem>
+                <MenuItem value="name:desc">Name Descending</MenuItem>
+                <MenuItem value="age:asc">Age Ascending</MenuItem>
+                <MenuItem value="age:desc">Age Descending</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -180,7 +175,9 @@ const Home = () => {
           <Grid item xs={12} sm={6} md={4} key={dog.id}>
             <Card className="dog-card">
               <CardContent>
-                <img src={dog.img} alt={dog.name} className="dog-image" />
+                <Box className="dog-image-container">
+                  <img src={dog.img} alt={dog.name} className="dog-image" />
+                </Box>
                 <Typography variant="h5" component="div">{dog.name}</Typography>
                 <Typography variant="body2" color="text.secondary">{dog.breed}</Typography>
                 <Typography variant="body2" color="text.secondary">Age: {dog.age}</Typography>
@@ -196,7 +193,11 @@ const Home = () => {
         ))}
       </Grid>
       <Box className="pagination-container">
-        <Pagination count={10} page={page} onChange={(e, value) => setPage(value)} />
+        <Pagination
+          count={Math.ceil(total / 25)}
+          page={page}
+          onChange={(e, value) => setPage(value)}
+        />
       </Box>
       <Button variant="contained" color="primary" onClick={generateMatch} disabled={favorites.length === 0} className="generate-match-button">
         Generate Match
@@ -206,7 +207,9 @@ const Home = () => {
           <Typography variant="h5">Match Found!</Typography>
           <Card className="dog-card">
             <CardContent>
-              <img src={match.img} alt={match.name} className="dog-image" />
+              <Box className="dog-image-container">
+                <img src={match.img} alt={match.name} className="dog-image" />
+              </Box>
               <Typography variant="h5" component="div">{match.name}</Typography>
               <Typography variant="body2" color="text.secondary">{match.breed}</Typography>
               <Typography variant="body2" color="text.secondary">Age: {match.age}</Typography>

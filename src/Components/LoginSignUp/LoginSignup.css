@@ -2,7 +2,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: #d8c3a5; /* Light brown background */
     margin: 0;
     font-family: Arial, sans-serif;

@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const axios = require('axios');
 const app = express();
 const port = 3000;
 
@@ -16,13 +17,14 @@ const users = [
   { name: 'Jane Doe', email: 'jane@example.com', password: 'password' }
 ];
 
-// Mock dog data
-const dogs = [
-  { id: '1', breed: 'Beagle', description: 'Friendly and curious', age: 2, gender: 'Male' },
-  { id: '2', breed: 'Bulldog', description: 'Calm and courageous', age: 3, gender: 'Female' },
-  { id: '3', breed: 'Poodle', description: 'Intelligent and active', age: 1, gender: 'Male' },
-  { id: '4', breed: 'Golden Retriever', description: 'Friendly and tolerant', age: 4, gender: 'Female' }
-];
+// Middleware to check for auth cookie
+const requireAuth = (req, res, next) => {
+  const token = req.cookies['fetch-access-token'];
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+};
 
 // Login endpoint
 app.post('/auth/login', (req, res) => {
@@ -37,20 +39,6 @@ app.post('/auth/login', (req, res) => {
   }
 });
 
-// Signup endpoint
-app.post('/auth/signup', (req, res) => {
-  const { name, email, password } = req.body;
-  const userExists = users.some(u => u.email === email);
-
-  if (userExists) {
-    res.status(400).send({ message: 'User already exists' });
-  } else {
-    users.push({ name, email, password });
-    res.cookie('fetch-access-token', 'some-auth-token', { httpOnly: true, maxAge: 3600000 });
-    res.status(201).send({ message: 'Signup successful' });
-  }
-});
-
 // Logout endpoint
 app.post('/auth/logout', (req, res) => {
   res.clearCookie('fetch-access-token');
@@ -58,51 +46,86 @@ app.post('/auth/logout', (req, res) => {
 });
 
 // Get breeds endpoint
-app.get('/dogs/breeds', (req, res) => {
-  const breeds = [...new Set(dogs.map(dog => dog.breed))];
-  res.status(200).send(breeds);
+app.get('/dogs/breeds', requireAuth, async (req, res) => {
+  try {
+    const response = await axios.get('https://frontend-take-home-service.fetch.com/dogs/breeds', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.cookies['fetch-access-token']}`
+      },
+      withCredentials: true
+    });
+    const breeds = response.data;
+    res.status(200).json(breeds);
+  } catch (error) {
+    console.error('Error fetching breeds:', error);
+    res.status(500).json({ error: 'Failed to fetch breeds' });
+  }
 });
 
 // Search dogs endpoint
-app.get('/dogs/search', (req, res) => {
-  const { breed, sortOrder, page = 1 } = req.query;
-  const pageSize = 6;
-  let filteredDogs = dogs;
-
-  if (breed) {
-    filteredDogs = filteredDogs.filter(dog => dog.breed === breed);
+app.get('/dogs/search', requireAuth, async (req, res) => {
+  const { breeds, zipCodes, ageMin, ageMax, size = 25, from, sort } = req.query;
+  try {
+    const response = await axios.get('https://frontend-take-home-service.fetch.com/dogs/search', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.cookies['fetch-access-token']}`
+      },
+      params: { breeds, zipCodes, ageMin, ageMax, size, from, sort },
+      withCredentials: true
+    });
+    const data = response.data;
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error searching dogs:', error);
+    res.status(500).json({ error: 'Failed to search dogs' });
   }
-
-  filteredDogs = filteredDogs.sort((a, b) => {
-    if (sortOrder === 'desc') {
-      return b.breed.localeCompare(a.breed);
-    }
-    return a.breed.localeCompare(b.breed);
-  });
-
-  const total = filteredDogs.length;
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedDogs = filteredDogs.slice(startIndex, endIndex);
-
-  res.status(200).send({
-    resultIds: paginatedDogs.map(dog => dog.id),
-    dogs: paginatedDogs.reduce((acc, dog) => {
-      acc[dog.id] = dog;
-      return acc;
-    }, {}),
-    total,
-    next: endIndex < total ? page + 1 : null,
-    prev: startIndex > 0 ? page - 1 : null
-  });
 });
 
 // Match endpoint
-app.post('/dogs/match', (req, res) => {
+app.post('/dogs/match', requireAuth, async (req, res) => {
   const { favoriteIds } = req.body;
-  const favoriteDogs = dogs.filter(dog => favoriteIds.includes(dog.id));
-  const match = favoriteDogs[Math.floor(Math.random() * favoriteDogs.length)];
-  res.status(200).send(match);
+  try {
+    const response = await axios.post('https://frontend-take-home-service.fetch.com/dogs/match', { favoriteIds }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.cookies['fetch-access-token']}`
+      },
+      withCredentials: true
+    });
+    const match = response.data;
+    res.status(200).json(match);
+  } catch (error) {
+    console.error('Error matching dogs:', error);
+    res.status(500).json({ error: 'Failed to match dogs' });
+  }
+});
+
+// Search locations endpoint
+app.post('/locations/search', requireAuth, async (req, res) => {
+  const { city, states, geoBoundingBox, size = 25, from } = req.body;
+  try {
+    const response = await axios.post('https://frontend-take-home-service.fetch.com/locations/search', {
+      city,
+      states,
+      geoBoundingBox,
+      size,
+      from
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.cookies['fetch-access-token']}`
+      },
+      withCredentials: true
+    });
+
+    const { results, total } = response.data;
+    res.status(200).json({ results, total });
+  } catch (error) {
+    console.error('Error searching locations:', error);
+    res.status(500).json({ error: 'Failed to search locations' });
+  }
 });
 
 // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
