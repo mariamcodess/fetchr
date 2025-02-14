@@ -61,26 +61,26 @@ Fetchr App is a web application that allows users to search for dogs available f
 
 # Authentication
 Login
-URL: /auth/login
-Method: POST
-Body: { "name": "John Doe", "email": "john@example.com" }
-Response: { "message": "Login successful" }
+- URL: /auth/login
+- Method: POST
+- Body: { "name": "John Doe", "email": "john@example.com" }
+- Response: { "message": "Login successful" }
 
 Logout
-URL: /auth/logout
-Method: POST
-Response: { "message": "Logout successful" }
-Dogs
-Get Breeds
+- URL: /auth/logout
+- Method: POST
+- Response: { "message": "Logout successful" }
 
-URL: /dogs/breeds
-Method: GET
-Response: A list of dog breeds.
+# Dogs
+- Get Breeds
+- URL: /dogs/breeds
+- Method: GET
+- Response: A list of dog breeds.
 
 # Search Dogs
-URL: /dogs/search
-Method: GET
-Query Parameters:
+- URL: /dogs/search
+- Method: GET
+- Query Parameters:
 breeds: An array of breeds.
 zipCodes: An array of zip codes.
 ageMin: A minimum age.
@@ -88,19 +88,20 @@ ageMax: A maximum age.
 size: The number of results to return (default: 25).
 from: A cursor to be used when paginating results (optional).
 sort: The field by which to sort results, and the direction of the sort (e.g., sort=breed:asc).
-Response: An object with the search results and total count.
-Match Dogs
+Response: An object with the search results and total count. 
 
-URL: /dogs/match
-Method: POST
-Body: { "favoriteIds": [1, 2, 3] }
-Response: A matched dog.
+
+# Match Dogs
+- URL: /dogs/match
+- Method: POST
+- Body: { "favoriteIds": [1, 2, 3] }
+- Response: A matched dog.
 
 
 # Locations
 Search Locations
-URL: /locations/search
-Method: POST
+- URL: /locations/search
+- Method: POST
 {
   "city": "San Francisco",
   "states": ["CA"],
@@ -111,4 +112,4 @@ Method: POST
   "size": 25,
   "from": 0
 }
-Response: { "results": [...], "total": 100 }
+- Response: { "results": [...], "total": 100 }
