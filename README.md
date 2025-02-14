@@ -52,9 +52,9 @@ Fetchr App is a web application that allows users to search for dogs available f
     The server will start on http://localhost:3000.
 
 
-### API Endpoints
+## API Endpoints
 
-# Authentication
+### Authentication
 Login
 URL: /auth/login
    ```bash
@@ -76,7 +76,7 @@ Method: GET
 Response: A list of dog breeds.
 ```
 
-# Search Dogs
+### Search Dogs
 URL: /dogs/search
 ```bash
 Method: GET
@@ -90,7 +90,7 @@ from: A cursor to be used when paginating results (optional).
 sort: The field by which to sort results, and the direction of the sort (e.g., sort=breed:asc).
 Response: An object with the search results and total count.
 ```
-Match Dogs
+### Match Dogs
 URL: /dogs/match
 ```bash
 Method: POST
@@ -99,7 +99,7 @@ Response: A matched dog.
 ```
 
 
-# Locations
+### Locations
 Search Locations
 URL: /locations/search
 ```bash
