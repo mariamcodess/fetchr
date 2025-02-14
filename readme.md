@@ -58,11 +58,10 @@ Fetchr App is a web application that allows users to search for dogs available f
 Login
 - URL: /auth/login
 - Method: POST
-```json
+```bash
 - Body: { "name": "John Doe", "email": "john@example.com" }
-```
 - Response: { "message": "Login successful" }
-
+```
 Logout
 - URL: /auth/logout
 - Method: POST
@@ -78,7 +77,7 @@ Logout
 - URL: /dogs/search
 - Method: GET
 - Query Parameters:
-```json
+```bash
 breeds: An array of breeds.
 zipCodes: An array of zip codes.
 ageMin: A minimum age.
@@ -100,7 +99,7 @@ Response: An object with the search results and total count.
 Search Locations
 - URL: /locations/search
 - Method: POST
-```json
+```bash
 {
   "city": "San Francisco",
   "states": ["CA"],
@@ -111,5 +110,4 @@ Search Locations
   "size": 25,
   "from": 0
 }
-```
 - Response: { "results": [...], "total": 100 }
