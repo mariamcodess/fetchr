@@ -38,11 +38,6 @@ Fetchr App is a web application that allows users to search for dogs available f
     cd client
     npm install
 
-3. Install dependencies for the server:
-    cd ../server
-    npm install
-
-
 ### Running the Application
 
 1. Start react app
@@ -50,13 +45,11 @@ Fetchr App is a web application that allows users to search for dogs available f
     npm start
     The app will start on http://localhost:3000.
 
-
 2. start the server
     ```bash
     cd server.js
     node server.js
     The server will start on http://localhost:3000.
-
 
 
 ## API Endpoints
