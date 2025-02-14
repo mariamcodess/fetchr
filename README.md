@@ -52,7 +52,7 @@ Fetchr App is a web application that allows users to search for dogs available f
     The server will start on http://localhost:3000.
 
 
-## API Endpoints
+### API Endpoints
 
 # Authentication
 Login
