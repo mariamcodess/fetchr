@@ -34,12 +34,7 @@ Fetchr App is a web application that allows users to search for dogs available f
    git clone https://github.com/yourusername/fetchr-app.git
    cd fetchr-app
 
-2. Install dependencies for the client:
-    cd client
-    npm install
-
-3. Install dependencies for the server:
-    cd ../server
+2. Install dependencies:
     npm install
 
 
@@ -63,7 +58,9 @@ Fetchr App is a web application that allows users to search for dogs available f
 Login
 - URL: /auth/login
 - Method: POST
+```json
 - Body: { "name": "John Doe", "email": "john@example.com" }
+```
 - Response: { "message": "Login successful" }
 
 Logout
@@ -81,6 +78,7 @@ Logout
 - URL: /dogs/search
 - Method: GET
 - Query Parameters:
+```json
 breeds: An array of breeds.
 zipCodes: An array of zip codes.
 ageMin: A minimum age.
@@ -89,7 +87,7 @@ size: The number of results to return (default: 25).
 from: A cursor to be used when paginating results (optional).
 sort: The field by which to sort results, and the direction of the sort (e.g., sort=breed:asc).
 Response: An object with the search results and total count. 
-
+```
 
 # Match Dogs
 - URL: /dogs/match
@@ -102,6 +100,7 @@ Response: An object with the search results and total count.
 Search Locations
 - URL: /locations/search
 - Method: POST
+```json
 {
   "city": "San Francisco",
   "states": ["CA"],
@@ -112,4 +111,5 @@ Search Locations
   "size": 25,
   "from": 0
 }
+```
 - Response: { "results": [...], "total": 100 }
