@@ -46,11 +46,13 @@ Fetchr App is a web application that allows users to search for dogs available f
 ### Running the Application
 
 1. Start react app
+    ```bash
     npm start
     The app will start on http://localhost:3000.
 
 
 2. start the server
+    ```bash
     cd server.js
     node server.js
     The server will start on http://localhost:3000.
