@@ -62,23 +62,28 @@ Fetchr App is a web application that allows users to search for dogs available f
 # Authentication
 Login
 URL: /auth/login
+   ```bash
 Method: POST
 Body: { "name": "John Doe", "email": "john@example.com" }
 Response: { "message": "Login successful" }
-
+```
 Logout
 URL: /auth/logout
+```bash
 Method: POST
 Response: { "message": "Logout successful" }
+```
 Dogs
 Get Breeds
-
 URL: /dogs/breeds
+```bash
 Method: GET
 Response: A list of dog breeds.
+```
 
 # Search Dogs
 URL: /dogs/search
+```bash
 Method: GET
 Query Parameters:
 breeds: An array of breeds.
@@ -89,17 +94,20 @@ size: The number of results to return (default: 25).
 from: A cursor to be used when paginating results (optional).
 sort: The field by which to sort results, and the direction of the sort (e.g., sort=breed:asc).
 Response: An object with the search results and total count.
+```
 Match Dogs
-
 URL: /dogs/match
+```bash
 Method: POST
 Body: { "favoriteIds": [1, 2, 3] }
 Response: A matched dog.
+```
 
 
 # Locations
 Search Locations
 URL: /locations/search
+```bash
 Method: POST
 {
   "city": "San Francisco",
@@ -112,3 +120,4 @@ Method: POST
   "from": 0
 }
 Response: { "results": [...], "total": 100 }
+```
